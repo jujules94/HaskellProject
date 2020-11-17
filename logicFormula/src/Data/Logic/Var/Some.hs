@@ -1,5 +1,5 @@
 module Data.Logic.Var.Some (
-  -- * Testing Var Int
+  -- * Testing Var String
   x1
 , x2
 , x3

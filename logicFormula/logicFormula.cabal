@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3cd562a912e0df79d20403d525192b19481cc985cd205949c3083955c0c78fd1
+-- hash: 2ef952d97c1fd66173d636abc89a99dad647cfd5d126944ddd3000888f355d1f
 
 name:           logicFormula
 version:        0.1.0.0
@@ -38,6 +38,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , containers
   default-language: Haskell2010
 
 executable logicFormula-exe
@@ -49,6 +50,7 @@ executable logicFormula-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
     , logicFormula
   default-language: Haskell2010
 
@@ -62,5 +64,6 @@ test-suite logicFormula-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
     , logicFormula
   default-language: Haskell2010
