@@ -25,7 +25,7 @@ module Data.Logic.Fml.Combinator (
   -- Just (Or (Final 1) (Or (Final 2) (Or (Final 3) (Final 4))))
   multOr :: [Fml.Fml a] -> Maybe (Fml.Fml a)
   multOr [] = Nothing
-  multOr (x:xs) = Just x                               --totally wrong, for compilation purpose
+  multOr (x:xs) = Just x --totally wrong, for compilation purpose
 
   -- |’multAnd’ @fs@ returns the conjunction of the formulas in @fs.
   -- It returns @Nothing@ if @fs@ is the empty list.

@@ -15,12 +15,15 @@ module Data.Logic.Fml (
   --, toCCNF
   , toDNF
   --, toUniversalNAnd
+  --, toUniversalNOr
 
   -- * Testing
   --, isNNF
   --, isCNF
   --, isCCNF
   --, isDNF
+  --, isUniversalNAnd
+  --, isUniversalNOr
 
 ) where
 
@@ -38,6 +41,8 @@ data Fml a = And   (Fml a) (Fml a)
            | Not   (Fml a)
            | Final (Var.Var a)
            deriving (Show)
+
+-- ############  QUERYING  ############
 
 -- |’prettyFormat’ @p@ return a string representation of the formula @p@.
 -- and :        .
@@ -90,6 +95,8 @@ depth (XOr   p q) = 1 + max (depth p) (depth q)
 depth (XNOr  p q) = 1 + max (depth p) (depth q)
 depth (Imply p q) = 1 + max (depth p) (depth q)
 depth (Equiv p q) = 1 + max (depth p) (depth q)
+
+-- ############  TRANSFORMING  ############
 
 -- |’toNNF’ @f@ converts the formula @f@ to NNF.
 toNNF :: Fml a -> Fml a
@@ -195,4 +202,35 @@ devConDNF (XNOr  p q)        = XNOr  (devConDNF p) (devConDNF q)
 devConDNF (Imply p q)        = Imply (devConDNF p) (devConDNF q)
 devConDNF (Equiv p q)        = Equiv (devConDNF p) (devConDNF q)
 
+-- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
+--toCCNF :: Fml a -> Fml a
 
+-- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
+-- to formula @p@.
+--toUniversalNAnd :: Fml a -> Fml a
+
+-- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
+-- to formula @p@.
+--toUniversalNOr :: Fml a -> Fml a
+
+-- ############  TESTING  ############
+
+-- |’isNNF’ @f@ returns true iff formula @f@ is NNF.
+--isNNF :: Fml a -> Fml a
+
+-- |’isCNF’ @f@ returns true iff formula @f@ is CNF.
+--isCNF :: Fml a -> Fml a
+
+-- |’isDNF’ @f@ returns true iff formula @f@ is DNF.
+--isDNF :: Fml a -> Fml a
+
+-- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
+--isCCNF :: Fml a -> Bool
+
+-- |’isUniversalNAnd’ @p@ returns true iff formula @p@ uses only NAND
+-- and variables.
+--isUniversalNAnd :: Fml a -> Bool
+
+-- |’isUniversalNOr’ @p@ returns true iff formula @p@ uses only NOR
+-- and variables.
+--isUniversalNOr :: Fml a -> Bool
