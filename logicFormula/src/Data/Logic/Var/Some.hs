@@ -9,6 +9,11 @@ module Data.Logic.Var.Some (
 , x7
 , x8
 , x9
+, a
+, b
+, c
+, p
+, q
 ) where
 
 import qualified Data.Logic.Var as Var
@@ -39,3 +44,18 @@ x8 = Var.mk "x9"
 
 x9 :: Var.Var String
 x9 = Var.mk "x9"
+
+a :: Var.Var String
+a = Var.mk "A"
+
+b :: Var.Var String
+b = Var.mk "B"
+
+c :: Var.Var String
+c = Var.mk "C"
+
+p :: Var.Var String
+p = Var.mk "P"
+
+q :: Var.Var String
+q = Var.mk "Q"
