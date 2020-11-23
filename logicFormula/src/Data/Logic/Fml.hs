@@ -244,8 +244,9 @@ checkCNF (Or    p q) = checkDisj p && checkDisj q
     checkDisj (Final p)       = True
     checkDisj (Not (Final p)) = True
     checkDisj f               = False
-checkCNF (Final p)  = True
-checkCNF f          = False
+checkCNF (Final p)       = True
+checkCNF (Not (Final p)) = True
+checkCNF f               = False
 
 -- |checkDisj @f@ returns true iff formula @f@ is a only composed of disjunction.
 --checkDisj :: Fml a -> Bool
@@ -263,8 +264,9 @@ checkDNF (And   p q) = checkConj p && checkConj q
     checkConj (Final p)       = True
     checkConj (Not (Final p)) = True
     checkConj f               = False
-checkDNF (Final p)  = True
-checkDNF f          = False
+checkDNF (Final p)       = True
+checkDNF (Not (Final p)) = True
+checkDNF f               = False
 
 -- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
 isCCNF :: Fml a -> Bool

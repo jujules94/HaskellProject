@@ -137,8 +137,8 @@ module Data.Logic.Fml.Some (
       f2 = Fml.And (Fml.Final Vars.p) (Fml.Final Vars.q)
       f3 = Fml.And (Fml.Final Vars.a) (Fml.Final Vars.b)
 
-  -- A → (B ∧ (¬(¬C ∧ P)) ≡ ¬A ∨ (B ∧ (C ∨ ¬P)) ≡ (¬A ∨ B) ∧ (¬A ∨ C ∨ ¬P) ≡ ¬A ∨ (B ∧ C) ∨ (B ∧ ¬P)
-  --                        NNF                   CNF                        DNF
+  -- A → (B ∧ (¬(¬C ∧ P))) ≡ ¬A ∨ (B ∧ (C ∨ ¬P)) ≡ (¬A ∨ B) ∧ (¬A ∨ C ∨ ¬P) ≡ ¬A ∨ (B ∧ C) ∨ (B ∧ ¬P)
+  --                         NNF                   CNF                        DNF
   jfml16 :: Fml.Fml String
   jfml16 = f
     where
