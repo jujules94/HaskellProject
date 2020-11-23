@@ -12,16 +12,16 @@ module Data.Logic.Fml (
   -- * Transforming
   , toNNF
   , toCNF
-  --, toCCNF
+  , toCCNF
   , toDNF
   --, toUniversalNAnd
   --, toUniversalNOr
 
   -- * Testing
-  --, isNNF
-  --, isCNF
-  --, isCCNF
-  --, isDNF
+  , isNNF
+  , isCNF
+  , isCCNF
+  , isDNF
   --, isUniversalNAnd
   --, isUniversalNOr
 
@@ -121,7 +121,6 @@ delCon (XNOr  p q) = Or (And (delCon p) (delCon q)) (And (Not (delCon p)) (Not (
 delCon (Imply p q) = Or (Not (delCon p)) (delCon q)
 delCon (Equiv p q) = delCon (XNOr p q)
 
-
 -- |morgSimp @f@ simplify the formula with deMorgan rules.
 -- 'not' (p 'and' q) = 'not' p 'or'  'not' q
 -- 'not' (p 'or'  q) = 'not' p 'and' 'not' q
@@ -138,8 +137,6 @@ morgSimp (XOr   p q)        = XOr   (morgSimp p) (morgSimp q)
 morgSimp (XNOr  p q)        = XNOr  (morgSimp p) (morgSimp q)
 morgSimp (Imply p q)        = Imply (morgSimp p) (morgSimp q)
 morgSimp (Equiv p q)        = Equiv (morgSimp p) (morgSimp q)
-
-
 
 -- |delDN @f@ simplify the formula @f@ so there is no double negation anymore.
 -- 'not' 'not' p = p
@@ -189,21 +186,26 @@ devConCNF (Equiv p q)        = Equiv (devConCNF p) (devConCNF q)
 -- right-associative
 -- (q 'or'  r) 'and' p = (q 'and' p) 'or'  (r 'and' p)
 devConDNF :: Fml a -> Fml a
-devConDNF (And p (Or  q r))  = Or  (devConDNF (And p q)) (devConDNF (And p r))
-devConDNF (And (Or  q r) p)  = Or  (devConDNF (And q p)) (devConDNF (And r p))
-devConDNF f@(Final p)        = f
-devConDNF (Not   p)          = Not   (devConDNF p)
-devConDNF (And   p q)        = And   (devConDNF p) (devConDNF q)
-devConDNF (Or    p q)        = Or    (devConDNF p) (devConDNF q)
-devConDNF (NAnd  p q)        = NAnd  (devConDNF p) (devConDNF q)
-devConDNF (NOr   p q)        = NOr   (devConDNF p) (devConDNF q)
-devConDNF (XOr   p q)        = XOr   (devConDNF p) (devConDNF q)
-devConDNF (XNOr  p q)        = XNOr  (devConDNF p) (devConDNF q)
-devConDNF (Imply p q)        = Imply (devConDNF p) (devConDNF q)
-devConDNF (Equiv p q)        = Equiv (devConDNF p) (devConDNF q)
+devConDNF (And p (Or  q r)) = Or  (devConDNF (And p q)) (devConDNF (And p r))
+devConDNF (And (Or  q r) p) = Or  (devConDNF (And q p)) (devConDNF (And r p))
+devConDNF f@(Final p)       = f
+devConDNF (Not   p)         = Not   (devConDNF p)
+devConDNF (And   p q)       = And   (devConDNF p) (devConDNF q)
+devConDNF (Or    p q)       = Or    (devConDNF p) (devConDNF q)
+devConDNF (NAnd  p q)       = NAnd  (devConDNF p) (devConDNF q)
+devConDNF (NOr   p q)       = NOr   (devConDNF p) (devConDNF q)
+devConDNF (XOr   p q)       = XOr   (devConDNF p) (devConDNF q)
+devConDNF (XNOr  p q)       = XNOr  (devConDNF p) (devConDNF q)
+devConDNF (Imply p q)       = Imply (devConDNF p) (devConDNF q)
+devConDNF (Equiv p q)       = Equiv (devConDNF p) (devConDNF q)
 
 -- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
---toCCNF :: Fml a -> Fml a
+toCCNF :: Fml a -> Fml a
+toCCNF = toCNF
+
+-- |factCNF @f@ factorise a CNF formula to CCNF @f@.
+--factCNF :: Fml a -> Fml a
+--factCNF (And   p q)
 
 -- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
 -- to formula @p@.
@@ -216,16 +218,64 @@ devConDNF (Equiv p q)        = Equiv (devConDNF p) (devConDNF q)
 -- ############  TESTING  ############
 
 -- |’isNNF’ @f@ returns true iff formula @f@ is NNF.
---isNNF :: Fml a -> Fml a
+isNNF :: Fml a -> Bool
+isNNF (Final p)       = True
+isNNF (Not (Final p)) = True
+isNNF (Not (f))       = False
+isNNF (And   p q)     = isNNF p && isNNF q
+isNNF (Or    p q)     = isNNF p && isNNF q
+isNNF (NAnd  p q)     = isNNF p && isNNF q
+isNNF (NOr   p q)     = isNNF p && isNNF q
+isNNF (XOr   p q)     = isNNF p && isNNF q
+isNNF (XNOr  p q)     = isNNF p && isNNF q
+isNNF (Imply p q)     = isNNF p && isNNF q
+isNNF (Equiv p q)     = isNNF p && isNNF q
 
 -- |’isCNF’ @f@ returns true iff formula @f@ is CNF.
---isCNF :: Fml a -> Fml a
+isCNF :: Fml a -> Bool
+isCNF f = checkCNF f && isNNF f
+
+-- |checkCNF @f@ returns true iff formula @f@ is a conjuction of disjunction.
+checkCNF :: Fml a -> Bool
+checkCNF (And   p q) = checkCNF p      && checkCNF q
+checkCNF (Or    p q) = checkDisj p && checkDisj q
+  where
+    checkDisj (Or    p q)     = checkDisj p && checkDisj q
+    checkDisj (Final p)       = True
+    checkDisj (Not (Final p)) = True
+    checkDisj f               = False
+checkCNF (Final p)  = True
+checkCNF f          = False
+
+-- |checkDisj @f@ returns true iff formula @f@ is a only composed of disjunction.
+--checkDisj :: Fml a -> Bool
 
 -- |’isDNF’ @f@ returns true iff formula @f@ is DNF.
---isDNF :: Fml a -> Fml a
+isDNF :: Fml a -> Bool
+isDNF f = checkDNF f && isNNF f
+
+-- |checkDNF @f@ returns true iff formula @f@ is a disjunction of conjuction.
+checkDNF :: Fml a -> Bool
+checkDNF (Or    p q) = checkDNF p      && checkDNF q
+checkDNF (And   p q) = checkConj p && checkConj q
+  where
+    checkConj (And    p q)    = checkConj p && checkConj q
+    checkConj (Final p)       = True
+    checkConj (Not (Final p)) = True
+    checkConj f               = False
+checkDNF (Final p)  = True
+checkDNF f          = False
 
 -- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
---isCCNF :: Fml a -> Bool
+isCCNF :: Fml a -> Bool
+isCCNF f = checkRec f && isCNF f
+
+-- |checkRec @f@ returns true iff formula @f@ is recursively correct.
+checkRec :: Fml a -> Bool
+checkRec (Or  p q)        = True
+checkRec (And (Or p q) r) = checkRec r
+checkRec f                = False
+
 
 -- |’isUniversalNAnd’ @p@ returns true iff formula @p@ uses only NAND
 -- and variables.

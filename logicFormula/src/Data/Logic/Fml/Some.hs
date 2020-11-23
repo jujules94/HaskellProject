@@ -18,6 +18,14 @@ module Data.Logic.Fml.Some (
 , jfml14
 , jfml15
 , jfml16
+, jfml17
+, jfml18
+, jfml19
+, jfml20
+, jfml21
+, jfml22
+, jfml23
+, jfml24
 ) where
 
   import qualified Data.Logic.Var      as Var
@@ -138,3 +146,66 @@ module Data.Logic.Fml.Some (
       f1 = Fml.And (Fml.Final Vars.b) f2
       f2 = Fml.Not(f3)
       f3 = Fml.And (Fml.Not $ Fml.Final Vars.c) (Fml.Final Vars.p)
+
+  -- CNF : (x1 ∨ ¬x2) ∧ (x1 ∨ x3 ∨ x4) ∧ (¬x1 ∨ ¬x3)
+  jfml17 :: Fml.Fml String
+  jfml17 = f
+    where
+      f = Fml.And f1 f2
+      f1 = Fml.Or (Fml.Final Vars.a) (Fml.Not $ Fml.Final Vars.b)
+      f2 = Fml.And f3 f4
+      f3 = Fml.Or (f5) (Fml.Final Vars.p)
+      f4 = Fml.Or (Fml.Not $ Fml.Final Vars.a) (Fml.Not $ Fml.Final Vars.c)
+      f5 = Fml.Or (Fml.Final Vars.a) (Fml.Final Vars.c)
+
+  -- ¬CNF et ¬DNF : ¬(x1 ∧ x2)
+  jfml18 :: Fml.Fml String
+  jfml18 = f
+    where
+      f = Fml.Not f1
+      f1 = Fml.And (Fml.Final Vars.a) (Fml.Final Vars.b)
+
+  -- ¬CNF et ¬DNF : x1 ∧ (x2 ∨ (x3 ∧ x4))
+  jfml19 :: Fml.Fml String
+  jfml19 = f
+    where
+      f = Fml.And (Fml.Final Vars.a) f1
+      f1 = Fml.Or (Fml.Final Vars.b) f2
+      f2 = Fml.And (Fml.Final Vars.c) (Fml.Final Vars.p)
+
+  -- DNF : (x1 ∧ ¬x2) ∨ (x1 ∧ x3 ∧ x4) ∨ (¬x1 ∧ ¬x3)
+  jfml20 :: Fml.Fml String
+  jfml20 = f
+    where
+      f = Fml.Or f1 f2
+      f1 = Fml.And (Fml.Final Vars.a) (Fml.Not $ Fml.Final Vars.b)
+      f2 = Fml.Or f3 f4
+      f3 = Fml.And (f5) (Fml.Final Vars.p)
+      f4 = Fml.And (Fml.Not $ Fml.Final Vars.a) (Fml.Not $ Fml.Final Vars.c)
+      f5 = Fml.And (Fml.Final Vars.a) (Fml.Final Vars.c)
+
+  -- CCNF : (x1 ∨ x2)
+  jfml21 :: Fml.Fml String
+  jfml21 = Fml.Or (Fml.Final Vars.a) (Fml.Final Vars.b)
+
+  -- CCNF : (x1 ∨ x2) ∧ (¬x2 ∨ x3)
+  jfml22 :: Fml.Fml String
+  jfml22 = Fml.And (jfml21) f
+    where
+      f = Fml.Or (Fml.Not $ Fml.Final Vars.b) (Fml.Final Vars.c)
+
+  -- CCNF : (x1 ∨ x2) ∧ ((¬x2 ∨ x3) ∧ (x1 ∨ x2 ∨ ¬x3))
+  jfml23 :: Fml.Fml String
+  jfml23 = Fml.And (jfml21) f
+    where
+      f = Fml.And f1 f2
+      f1 = Fml.Or (Fml.Not $ Fml.Final Vars.b) (Fml.Final Vars.c)
+      f2 = Fml.Or jfml21 (Fml.Not $ Fml.Final Vars.c)
+
+  -- ¬CCNF : ((x1 ∨ x2) ∧ (¬x2 ∨ x3)) ∧ (x1 ∨ x2 ∨ ¬x3)
+  jfml24 :: Fml.Fml String
+  jfml24 = Fml.And f f2
+    where
+      f = Fml.And jfml21 f1
+      f1 = Fml.Or (Fml.Not $ Fml.Final Vars.b) (Fml.Final Vars.c)
+      f2 = Fml.Or jfml21 (Fml.Not $ Fml.Final Vars.c)
