@@ -201,7 +201,20 @@ devConDNF (Equiv p q)       = Equiv (devConDNF p) (devConDNF q)
 
 -- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
 toCCNF :: Fml a -> Fml a
-toCCNF = toCNF
+toCCNF = buildCCNF . getDisjs
+  where
+    buildCCNF [x]    = x
+    buildCCNF (x:xs) = And x $ buildCCNF xs
+
+-- |getDisjs @f@ return the Disjunctions clause of a formula @f@.
+getDisjs :: Fml a -> [Fml a]
+getDisjs = searchDisjs . toCNF
+  where
+    searchDisjs f@(Or  p q)       = [f]
+    searchDisjs f@(Final p)       = [f]
+    searchDisjs f@(Not (Final p)) = [f]
+    searchDisjs   (And p q)       = searchDisjs p ++ searchDisjs q
+    searchDisjs f                 = []
 
 -- |factCNF @f@ factorise a CNF formula to CCNF @f@.
 --factCNF :: Fml a -> Fml a
