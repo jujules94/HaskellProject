@@ -212,23 +212,23 @@ toCCNF = toCNF
 --toUniversalNAnd :: Fml a -> Fml a
 toUniversalNAnd :: Fml a -> Fml a
 toUniversalNAnd f@(Final p) = f
--- NOT ( A NAND A )
+-- NOT => ( A NAND A )
 toUniversalNAnd (Not   p)   = NAnd (toUniversalNAnd p) (toUniversalNAnd p)
--- NAND (A NAND B)
+-- NAND => (A NAND B)
 toUniversalNAnd (NAnd  p q) = NAnd (toUniversalNAnd p) (toUniversalNAnd q)
--- OR ( A NAND A ) NAND ( B NAND B ) 
+-- OR => ( A NAND A ) NAND ( B NAND B ) 
 toUniversalNAnd (Or    p q) = NAnd (toUniversalNAnd (Not p)) (toUniversalNAnd (Not q))
--- AND ( A NAND B ) NAND ( A NAND B ) 
+-- AND => ( A NAND B ) NAND ( A NAND B ) 
 toUniversalNAnd (And   p q) = NAnd (toUniversalNAnd(NAnd  p q)) (toUniversalNAnd(NAnd  p q))
--- NOR [ ( A NAND A ) NAND ( B NAND B ) ] NAND [ ( A NAND A ) NAND ( B NAND B ) ] 
+-- NOR => [ ( A NAND A ) NAND ( B NAND B ) ] NAND [ ( A NAND A ) NAND ( B NAND B ) ] 
 toUniversalNAnd (NOr   p q) = NAnd (NAnd (toUniversalNAnd(Not p)) (toUniversalNAnd(Not q))) (NAnd (toUniversalNAnd(Not p)) (toUniversalNAnd(Not q)))
--- XOR [ A NAND ( A NAND B ) ] NAND [ B NAND ( A NAND B ) ]
+-- XOR => [ A NAND ( A NAND B ) ] NAND [ B NAND ( A NAND B ) ]
 toUniversalNAnd (XOr   p q) = NAnd (NAnd (toUniversalNAnd p) (toUniversalNAnd(NAnd  p q))) (NAnd (toUniversalNAnd q) (toUniversalNAnd(NAnd  p q)))
--- XNOR [ ( A NAND A ) NAND ( B NAND B ) ] NAND ( A NAND B ) 
+-- XNOR => [ ( A NAND A ) NAND ( B NAND B ) ] NAND ( A NAND B ) 
 toUniversalNAnd (XNOr  p q) = NAnd (NAnd (toUniversalNAnd (Not p)) (toUniversalNAnd (Not q)))  (toUniversalNAnd(NAnd  p q))
--- IMPLY NOT [ A AND (Not B) ]
+-- IMPLY => NOT [ A AND (Not B) ]
 toUniversalNAnd (Imply p q) = toUniversalNAnd(Not (toUniversalNAnd(And (p) (toUniversalNAnd(Not q)))))
--- XNOR [ ( A NAND A ) NAND ( B NAND B ) ] NAND ( A NAND B ) 
+-- EQUIV => [ ( A NAND A ) NAND ( B NAND B ) ] NAND ( A NAND B ) 
 toUniversalNAnd (Equiv p q) = NAnd (NAnd (toUniversalNAnd(Not p)) (toUniversalNAnd (Not q))) (NAnd (toUniversalNAnd(p)) (toUniversalNAnd(q)))
 
 -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
@@ -236,23 +236,23 @@ toUniversalNAnd (Equiv p q) = NAnd (NAnd (toUniversalNAnd(Not p)) (toUniversalNA
 --toUniversalNOr :: Fml a -> Fml a
 toUniversalNOr :: Fml a -> Fml a
 toUniversalNOr f@(Final p)  = f
--- NOT ( A NOR A )
+-- NOT => ( A NOR A )
 toUniversalNOr (Not   p)    = NOr (toUniversalNOr p) (toUniversalNOr p)
--- NOR
+-- NOR => (A NOR B)
 toUniversalNOr (NOr   p q)  = NOr (toUniversalNOr p) (toUniversalNOr q)
--- AND ( A NOR A ) NOR ( B NOR B ) 
+-- AND => ( A NOR A ) NOR ( B NOR B ) 
 toUniversalNOr (And   p q)  = NOr (toUniversalNOr (Not p)) (toUniversalNOr (Not q))
--- OR ( A NOR B ) NOR ( A NOR B ) 
+-- OR => ( A NOR B ) NOR ( A NOR B ) 
 toUniversalNOr (Or    p q)  = NOr (toUniversalNOr(NOr  p q)) (toUniversalNOr(NOr  p q))
--- NAND [ ( A NOR A ) NOR ( B NOR B ) ] NOR [ ( A NOR A ) NOR ( B NOR B ) ] 
+-- NAND => [ ( A NOR A ) NOR ( B NOR B ) ] NOR [ ( A NOR A ) NOR ( B NOR B ) ] 
 toUniversalNOr (NAnd  p q)  = NOr (toUniversalNOr (And p q)) (toUniversalNOr (And p q))
--- XOR [ ( A NOR A ) NOR ( B NOR B ) ] NOR ( A NOR B ) 
+-- XOR => [ ( A NOR A ) NOR ( B NOR B ) ] NOR ( A NOR B ) 
 toUniversalNOr (XOr   p q)  = NOr (toUniversalNOr (And p q)) (toUniversalNOr (NOr p q))
--- XNOR [ A NOR ( A NOR B ) ] NOR [ B NOR ( A NOR B ) ]
+-- XNOR => [ A NOR ( A NOR B ) ] NOR [ B NOR ( A NOR B ) ]
 toUniversalNOr (XNOr  p q)  = NOr (toUniversalNOr (NOr p (toUniversalNOr (NOr p q)))) (toUniversalNOr (NOr q (toUniversalNOr (NOr p q))))
--- IMPLY NOT [ A AND (Not B) ]
+-- IMPLY => NOT [ A AND (Not B) ]
 toUniversalNOr (Imply p q)  = toUniversalNOr(Not (toUniversalNOr (And (p) (toUniversalNOr (Not q)))))
--- XNOR
+-- EQUIV => XNOR A B
 toUniversalNOr (Equiv p q)  = toUniversalNOr (XNOr p q)
 
 -- ############  TESTING  ############
