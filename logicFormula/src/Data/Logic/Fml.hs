@@ -14,7 +14,7 @@ module Data.Logic.Fml (
   , toCNF
   , toCCNF
   , toDNF
-  --, toUniversalNAnd
+  , toUniversalNAnd
   --, toUniversalNOr
 
   -- * Testing
@@ -210,6 +210,17 @@ toCCNF = toCNF
 -- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
 -- to formula @p@.
 --toUniversalNAnd :: Fml a -> Fml a
+toUniversalNAnd :: Fml a -> Fml a
+toUniversalNAnd f@(Final p) = f
+toUniversalNAnd (Not   p)   = NAnd (toUniversalNAnd p) (toUniversalNAnd p)
+toUniversalNAnd (NAnd  p q) = NAnd (toUniversalNAnd p) (toUniversalNAnd q)
+toUniversalNAnd (Or    p q) = NAnd (toUniversalNAnd (Not p)) (toUniversalNAnd (Not q))
+toUniversalNAnd (And   p q) = NAnd (toUniversalNAnd(NAnd  p q)) (toUniversalNAnd(NAnd  p q))
+toUniversalNAnd (NOr   p q) = NAnd (NAnd (toUniversalNAnd(Not p)) (toUniversalNAnd(Not q))) (NAnd (toUniversalNAnd(Not p)) (toUniversalNAnd(Not q)))
+toUniversalNAnd (XOr   p q) = NAnd (NAnd (toUniversalNAnd p) (toUniversalNAnd(NAnd  p q))) (NAnd (toUniversalNAnd q) (toUniversalNAnd(NAnd  p q)))
+toUniversalNAnd (XNOr  p q) = NAnd (NAnd (toUniversalNAnd (Not p)) (toUniversalNAnd (Not q)))  (toUniversalNAnd(NAnd  p q))
+toUniversalNAnd (Imply p q) = toUniversalNAnd(Not (toUniversalNAnd(And (p) (toUniversalNAnd(Not q)))))
+toUniversalNAnd (Equiv p q) = NAnd (NAnd (toUniversalNAnd(Not p)) (toUniversalNAnd (Not q))) (NAnd (toUniversalNAnd(p)) (toUniversalNAnd(q)))
 
 -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
 -- to formula @p@.
