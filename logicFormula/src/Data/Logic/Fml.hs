@@ -15,7 +15,7 @@ module Data.Logic.Fml (
   , toCCNF
   , toDNF
   , toUniversalNAnd
-  --, toUniversalNOr
+  , toUniversalNOr
 
   -- * Testing
   , isNNF
@@ -225,6 +225,17 @@ toUniversalNAnd (Equiv p q) = NAnd (NAnd (toUniversalNAnd(Not p)) (toUniversalNA
 -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
 -- to formula @p@.
 --toUniversalNOr :: Fml a -> Fml a
+toUniversalNOr :: Fml a -> Fml a
+toUniversalNOr f@(Final p)  = f
+toUniversalNOr (Not   p)    = NOr (toUniversalNOr p) (toUniversalNOr p)
+toUniversalNOr (NOr   p q)  = NOr (toUniversalNOr p) (toUniversalNOr q)
+toUniversalNOr (And   p q)  = NOr (toUniversalNOr (Not p)) (toUniversalNOr (Not q))
+toUniversalNOr (Or    p q)  = NOr (toUniversalNOr(NOr  p q)) (toUniversalNOr(NOr  p q))
+toUniversalNOr (NAnd  p q)  = NOr (toUniversalNOr (And p q)) (toUniversalNOr (And p q))
+toUniversalNOr (XOr   p q)  = NOr (toUniversalNOr (And p q)) (toUniversalNOr (NOr p q))
+toUniversalNOr (XNOr  p q)  = NOr (toUniversalNOr (NOr p (toUniversalNOr (NOr p q)))) (toUniversalNOr (NOr q (toUniversalNOr (NOr p q))))
+toUniversalNOr (Imply p q)  = toUniversalNOr(Not (toUniversalNOr (And (p) (toUniversalNOr (Not q)))))
+toUniversalNOr (Equiv p q)  = toUniversalNOr (XNOr p q)
 
 -- ############  TESTING  ############
 
