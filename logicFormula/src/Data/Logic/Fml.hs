@@ -201,7 +201,20 @@ devConDNF (Equiv p q)       = Equiv (devConDNF p) (devConDNF q)
 
 -- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
 toCCNF :: Fml a -> Fml a
-toCCNF = toCNF
+toCCNF = buildCCNF . getDisjs
+  where
+    buildCCNF [x]    = x
+    buildCCNF (x:xs) = And x $ buildCCNF xs
+
+-- |getDisjs @f@ return the Disjunctions clause of a formula @f@.
+getDisjs :: Fml a -> [Fml a]
+getDisjs = searchDisjs . toCNF
+  where
+    searchDisjs f@(Or  p q)       = [f]
+    searchDisjs f@(Final p)       = [f]
+    searchDisjs f@(Not (Final p)) = [f]
+    searchDisjs   (And p q)       = searchDisjs p ++ searchDisjs q
+    searchDisjs f                 = []
 
 -- |factCNF @f@ factorise a CNF formula to CCNF @f@.
 --factCNF :: Fml a -> Fml a
@@ -226,10 +239,10 @@ toUniversalNAnd (NOr   p q) = NAnd (NAnd (toUniversalNAnd(Not p)) (toUniversalNA
 toUniversalNAnd (XOr   p q) = NAnd (NAnd (toUniversalNAnd p) (toUniversalNAnd(NAnd  p q))) (NAnd (toUniversalNAnd q) (toUniversalNAnd(NAnd  p q)))
 -- XNOR => [ ( A NAND A ) NAND ( B NAND B ) ] NAND ( A NAND B ) 
 toUniversalNAnd (XNOr  p q) = NAnd (NAnd (toUniversalNAnd (Not p)) (toUniversalNAnd (Not q)))  (toUniversalNAnd(NAnd  p q))
--- IMPLY => NOT [ A AND (Not B) ]
-toUniversalNAnd (Imply p q) = toUniversalNAnd(Not (toUniversalNAnd(And (p) (toUniversalNAnd(Not q)))))
+-- IMPLY => A NAND ( NOT B )
+toUniversalNAnd (Imply p q) = NAnd p (toUniversalNAnd (Not q))
 -- EQUIV => [ ( A NAND A ) NAND ( B NAND B ) ] NAND ( A NAND B ) 
-toUniversalNAnd (Equiv p q) = NAnd (NAnd (toUniversalNAnd(Not p)) (toUniversalNAnd (Not q))) (NAnd (toUniversalNAnd(p)) (toUniversalNAnd(q)))
+toUniversalNAnd (Equiv p q) = NAnd (NAnd (toUniversalNAnd (Not p)) (toUniversalNAnd (Not q)))  (toUniversalNAnd(NAnd  p q))
 
 -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
 -- to formula @p@.
@@ -249,11 +262,11 @@ toUniversalNOr (NAnd  p q)  = NOr (toUniversalNOr (And p q)) (toUniversalNOr (An
 -- XOR => [ ( A NOR A ) NOR ( B NOR B ) ] NOR ( A NOR B ) 
 toUniversalNOr (XOr   p q)  = NOr (toUniversalNOr (And p q)) (toUniversalNOr (NOr p q))
 -- XNOR => [ A NOR ( A NOR B ) ] NOR [ B NOR ( A NOR B ) ]
-toUniversalNOr (XNOr  p q)  = NOr (toUniversalNOr (NOr p (toUniversalNOr (NOr p q)))) (toUniversalNOr (NOr q (toUniversalNOr (NOr p q))))
--- IMPLY => NOT [ A AND (Not B) ]
-toUniversalNOr (Imply p q)  = toUniversalNOr(Not (toUniversalNOr (And (p) (toUniversalNOr (Not q)))))
+toUniversalNOr (XNOr  p q)  = NOr (toUniversalNOr (NOr p (NOr p q))) (toUniversalNOr (NOr q (NOr p q)))
+-- IMPLY => A NOR ( NOT B )
+toUniversalNOr (Imply p q)  = NAnd p (toUniversalNOr (Not q))
 -- EQUIV => XNOR A B
-toUniversalNOr (Equiv p q)  = toUniversalNOr (XNOr p q)
+toUniversalNOr (Equiv p q)  = NOr (toUniversalNOr (NOr p (NOr p q))) (toUniversalNOr (NOr q (NOr p q)))
 
 -- ############  TESTING  ############
 
