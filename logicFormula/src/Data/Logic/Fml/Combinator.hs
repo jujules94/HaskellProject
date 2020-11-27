@@ -6,7 +6,7 @@ module Data.Logic.Fml.Combinator (
   , allOf
   , noneOf
   --, atLeast
-  --, atLeastOne
+  , atLeastOne
   --, atMost
   --, atMostOne
   --, eaxctly
@@ -77,7 +77,13 @@ module Data.Logic.Fml.Combinator (
   -- |’atLeastOne’ @vs@ returns a formula that is satisfiable iff at least one
   -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
   -- empty list.
-  -- atLeastOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+  atLeastOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+  atLeastOne []   = Nothing
+  atLeastOne [x]  = Just (Fml.Final x)
+  atLeastOne (xs) = Just (helper xs)
+    where
+      helper [x] = Fml.Final x
+      helper (x:xs) = Fml.Or (Fml.Final x) (helper xs)
 
   -- |’atMost’ @vs@ @k@ returns a formula that is satisfiable iff at most @k@
   -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
