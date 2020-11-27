@@ -22,7 +22,7 @@ module Data.Logic.Fml (
   , isCNF
   , isCCNF
   , isDNF
-  --, isUniversalNAnd
+  ,isUniversalNAnd
   --, isUniversalNOr
 
 ) where
@@ -295,7 +295,6 @@ checkCNF f               = False
 isDNF :: Fml a -> Bool
 isDNF f = checkDNF f && isNNF f
 
--- |checkDNF @f@ returns true iff formula @f@ is a disjunction of conjuction.
 checkDNF :: Fml a -> Bool
 checkDNF (Or    p q) = checkDNF p      && checkDNF q
 checkDNF (And   p q) = checkConj p && checkConj q
@@ -321,7 +320,17 @@ checkRec f                = False
 
 -- |’isUniversalNAnd’ @p@ returns true iff formula @p@ uses only NAND
 -- and variables.
---isUniversalNAnd :: Fml a -> Bool
+isUniversalNAnd :: Fml a -> Bool
+isUniversalNAnd (Final p)       = True
+isUniversalNAnd (NAnd p q)      = True && isUniversalNAnd (p) && isUniversalNAnd (q)
+isUniversalNAnd (Not (f))       = False
+isUniversalNAnd (And   p q)     = False
+isUniversalNAnd (Or    p q)     = False
+isUniversalNAnd (NOr   p q)     = False
+isUniversalNAnd (XOr   p q)     = False
+isUniversalNAnd (XNOr  p q)     = False
+isUniversalNAnd (Imply p q)     = False
+isUniversalNAnd (Equiv p q)     = False
 
 -- |’isUniversalNOr’ @p@ returns true iff formula @p@ uses only NOR
 -- and variables.
