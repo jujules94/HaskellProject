@@ -3,8 +3,8 @@ module Data.Logic.Fml.Combinator (
 
   multOr
   , multAnd
-  --, allOf
-  --, noneOf
+  , allOf
+  , noneOf
   --, atLeast
   --, atLeastOne
   --, atMost
@@ -50,11 +50,23 @@ module Data.Logic.Fml.Combinator (
 
   -- |’allOf’ @vs@ returns a formula that is satisfiable iff all variables
   -- in @vs@ are true. The function returns @Nothing@ if @vs@ is the empty list.
-  -- allOf :: [Var.Var a] -> Maybe (Fml.Fml a)
+  allOf :: [Var.Var a] -> Maybe (Fml.Fml a)
+  allOf []  = Nothing
+  allOf [x] = Just (Fml.Final x)
+  allOf (xs) = Just (helper xs)
+    where
+        helper [x] = Fml.Final x
+        helper (x:xs) = Fml.And (Fml.Final x) (helper xs)
 
   -- |’noneOf’ @vs@ returns a formula that is satisfiable iff no variable
   -- in @vs@ is true. The function returns @Nothing@ if @vs@ is the empty list.
-  -- noneOf :: [Var.Var a] -> Maybe (Fml.Fml a)
+  noneOf :: [Var.Var a] -> Maybe (Fml.Fml a)
+  noneOf []  = Nothing
+  noneOf [x] = Just (Fml.Not (Fml.Final x))
+  noneOf (xs) = Just (helper xs)
+    where
+        helper [x] = Fml.Not (Fml.Final x)
+        helper (x:xs) = Fml.And (Fml.Not (Fml.Final x)) (helper xs)
 
   -- |’atLeast’ @vs@ @k@ returns a formula that is satisfied iff at least @k@
   -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
