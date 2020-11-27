@@ -22,8 +22,8 @@ module Data.Logic.Fml (
   , isCNF
   , isCCNF
   , isDNF
-  ,isUniversalNAnd
-  --, isUniversalNOr
+  , isUniversalNAnd
+  , isUniversalNOr
 
 ) where
 
@@ -348,3 +348,14 @@ isUniversalNAnd (Equiv p q)     = False
 -- |’isUniversalNOr’ @p@ returns true iff formula @p@ uses only NOR
 -- and variables.
 --isUniversalNOr :: Fml a -> Bool
+isUniversalNOr :: Fml a -> Bool
+isUniversalNOr (Final p)       = True
+isUniversalNOr (NOr   p q)     = True && isUniversalNOr (p) && isUniversalNOr (q)
+isUniversalNOr (NAnd p q)      = False
+isUniversalNOr (Not (f))       = False
+isUniversalNOr (And   p q)     = False
+isUniversalNOr (Or    p q)     = False
+isUniversalNOr (XOr   p q)     = False
+isUniversalNOr (XNOr  p q)     = False
+isUniversalNOr (Imply p q)     = False
+isUniversalNOr (Equiv p q)     = False
